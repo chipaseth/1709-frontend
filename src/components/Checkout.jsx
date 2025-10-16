@@ -43,43 +43,51 @@ export default function Checkout() {
         ]
       },
       onSuccess: function(response) {
-        // Send order to backend after payment success
-        fetch('/api/orders', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: form.email,
-            name: `${form.firstName} ${form.lastName}`,
-            phone: form.phone,
-            address: {
-              complex: form.complex,
-              street: form.street,
-              town: form.town,
-              city: form.city,
-              province: form.province,
-              zip: form.zip
-            },
-            items: cart,
-            total: subtotal,
-            payment_reference: response.reference
-          })
-        })
-        .then(res => {
-          if (!res.ok) {
-            throw new Error(`HTTP error! status: ${res.status}`);
-          }
-          return res.json();
-        })
-        .then(data => {
-          console.log('Order saved successfully:', data);
-          alert('Order placed! Reference: ' + response.reference);
-          // Optionally clear cart or redirect
-        })
-        .catch((error) => {
-          console.error('Error saving order:', error);
-          alert('Order could not be saved, but payment was successful. Please contact support.');
-        });
+  const sanitizedItems = cart.map(i => ({
+    id: i.id,
+    title: i.title,
+    price: i.price,
+    quantity: i.quantity
+  }));
+
+  fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: form.email,
+      name: `${form.firstName} ${form.lastName}`,
+      phone: form.phone,
+      address: {
+        complex: form.complex,
+        street: form.street,
+        town: form.town,
+        city: form.city,
+        province: form.province,
+        zip: form.zip
       },
+      items: sanitizedItems,
+      total: subtotal,
+      payment_reference: response.reference
+    })
+  })
+  .then(async res => {
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(text || `HTTP ${res.status}`);
+    }
+    return res.json();
+  })
+  .then(data => {
+    console.log('Order saved successfully:', data);
+    alert('Order placed! Reference: ' + response.reference);
+    // Optionally clear cart or redirect
+  })
+  .catch(err => {
+    console.error('Error saving order:', err);
+    alert('Order could not be saved, but payment was successful. Please contact support.');
+  });
+},
+
       onClose: function() {
         alert('Payment window closed.');
       }
