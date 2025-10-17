@@ -57,7 +57,7 @@ export default function OverlayNav() {
         {/* Logo instead of ☰ */}
   <span className="icon menu">
     <img 
-      src="/src/assets/images/1709logo2.jpg" 
+      src="/images/1709logo2.jpg" 
       alt="Menu Logo" 
       className="nav-logo" 
     />
@@ -72,7 +72,7 @@ export default function OverlayNav() {
         onClick={handleOverlayClick}
       >
         <a href="/">
-          <img src="/src/assets/images/1709logo.jpg" alt="Utopia Logo" className="logo-animate" />
+          <img src="/images/1709logo.jpg" alt="Utopia Logo" className="logo-animate" />
         </a>
         <div className="links">
           <a href="/tour/" className="link-item">TOUR</a>

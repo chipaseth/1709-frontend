@@ -17,7 +17,7 @@ function Home() {
   return (
     <main className="center-img-wrap">
       <a href="/shop">
-      <img className="center-img" alt="1709hero" src="/src/assets/images/1709hero.jpg" />
+      <img className="center-img" alt="1709hero" src="/images/1709hero.jpg" />
       </a>
     </main>
   );
@@ -28,7 +28,7 @@ function Shop() {
     <main>
       <a href="/">
       <img 
-        src="/src/assets/images/1709logo.jpg" 
+        src="/images/1709logo.jpg" 
         alt="Shop" 
         style={{ 
           display: 'block', 
@@ -48,7 +48,7 @@ function TourPage(){
   return(
     <main>
       <img 
-        src="/src/assets/images/1709logo.jpg" 
+        src="/images/1709logo.jpg" 
         alt="Shop" 
         style={{ 
           display: 'block', 
