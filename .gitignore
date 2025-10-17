@@ -66,6 +66,12 @@ src/assets/videos/
 *.webm
 *.mkv
 
+# Specific video file to ignore
+"ICE (OFFICIAL VIDEO) - 1709 Records (1080p, h264).mp4"
+"For Da Money Official Music Video - 1709 Records (1080p, h264) (1).mp4"
+"No Regrets (Official Music Video) - 1709 Records (1080p, h264).mp4"
+"NUMBA (OFFICIAL MUSIC VIDEO) - 1709 Records (1080p, h264).mp4"
+
 # Editor / OS
 .vscode/*
 !.vscode/extensions.json
