@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCart } from "./CartContext";
 import { payWithPaystack } from "../utils/paystack";
+import { API, apiFetch } from '../utils/api';
 
 export default function Checkout() {
   const { cart } = useCart();
@@ -50,9 +51,8 @@ export default function Checkout() {
     quantity: i.quantity
   }));
 
-  fetch('/api/orders', {
+  apiFetch('/api/orders', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       email: form.email,
       name: `${form.firstName} ${form.lastName}`,
