@@ -70,13 +70,6 @@ export default function Checkout() {
       payment_reference: response.reference
     })
   })
-  .then(async res => {
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || `HTTP ${res.status}`);
-    }
-    return res.json();
-  })
   .then(data => {
     console.log('Order saved successfully:', data);
     alert('Order placed! Reference: ' + response.reference);
