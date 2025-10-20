@@ -1,6 +1,6 @@
 // ...existing code...
 import React, { useEffect, useState } from 'react';
-import { apiFetch } from '../../utils/api'; // ✅ replaced axios import
+import api from '../../utils/api'; // ✅ replaced axios import
 
 export default function OrderManagementView() {
   const [orders, setOrders] = useState([]);
