@@ -174,4 +174,15 @@ export default function OrderManagementView() {
                           </option>
                         )
                       )}
-                    </s
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+// ...existing code...
