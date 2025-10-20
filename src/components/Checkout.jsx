@@ -71,7 +71,7 @@ export default function Checkout() {
 
         // ✅ Use axios instance to send order to backend
         api
-          .post("/api/orders", {
+          .post("/orders", {
             email: form.email,
             name: `${form.firstName} ${form.lastName}`,
             phone: form.phone,
