@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useCart } from "./CartContext";
 import { payWithPaystack } from "../utils/paystack";
-import { API, apiFetch } from '../utils/api';
+import api from "../utils/api"; // ✅ Fixed import — default export, no {}
 
 export default function Checkout() {
   const { cart } = useCart();
@@ -15,10 +15,13 @@ export default function Checkout() {
     town: "",
     city: "",
     province: "",
-    zip: ""
+    zip: "",
   });
 
-  const subtotal = cart.reduce((sum, item) => sum + item.quantity * parseFloat(item.price.replace(/[^\d.]/g, "")), 0);
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.quantity * parseFloat(item.price.replace(/[^\d.]/g, "")),
+    0
+  );
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -26,11 +29,14 @@ export default function Checkout() {
 
   function handlePayNow(e) {
     e.preventDefault();
-    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || "pk_test_xxxxxxxxxxxxxxxxxxxxxxxx";
+    const publicKey =
+      import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || "pk_test_xxxxxxxxxxxxxxxxxxxxxxxx";
+
     if (!form.email || !form.phone || !form.firstName || !form.lastName) {
       alert("Please fill in all required fields.");
       return;
     }
+
     payWithPaystack({
       email: form.email,
       amount: subtotal,
@@ -38,52 +44,64 @@ export default function Checkout() {
       currency: "ZAR",
       metadata: {
         custom_fields: [
-          { display_name: "Mobile Number", variable_name: "mobile_number", value: form.phone },
-          { display_name: "Name", variable_name: "customer_name", value: `${form.firstName} ${form.lastName}` },
-          { display_name: "Delivery Address", variable_name: "delivery_address", value: `${form.complex} ${form.street}, ${form.town}, ${form.city}, ${form.province}, ${form.zip}` }
-        ]
+          {
+            display_name: "Mobile Number",
+            variable_name: "mobile_number",
+            value: form.phone,
+          },
+          {
+            display_name: "Name",
+            variable_name: "customer_name",
+            value: `${form.firstName} ${form.lastName}`,
+          },
+          {
+            display_name: "Delivery Address",
+            variable_name: "delivery_address",
+            value: `${form.complex} ${form.street}, ${form.town}, ${form.city}, ${form.province}, ${form.zip}`,
+          },
+        ],
       },
-      onSuccess: function(response) {
-  const sanitizedItems = cart.map(i => ({
-    id: i.id,
-    title: i.title,
-    price: i.price,
-    quantity: i.quantity
-  }));
+      onSuccess: function (response) {
+        const sanitizedItems = cart.map((i) => ({
+          id: i.id,
+          title: i.title,
+          price: i.price,
+          quantity: i.quantity,
+        }));
 
-  apiFetch('/api/orders', {
-    method: 'POST',
-    body: JSON.stringify({
-      email: form.email,
-      name: `${form.firstName} ${form.lastName}`,
-      phone: form.phone,
-      address: {
-        complex: form.complex,
-        street: form.street,
-        town: form.town,
-        city: form.city,
-        province: form.province,
-        zip: form.zip
+        // ✅ Use axios instance to send order to backend
+        api
+          .post("/api/orders", {
+            email: form.email,
+            name: `${form.firstName} ${form.lastName}`,
+            phone: form.phone,
+            address: {
+              complex: form.complex,
+              street: form.street,
+              town: form.town,
+              city: form.city,
+              province: form.province,
+              zip: form.zip,
+            },
+            items: sanitizedItems,
+            total: subtotal,
+            payment_reference: response.reference,
+          })
+          .then((res) => {
+            console.log("Order saved successfully:", res.data);
+            alert("Order placed! Reference: " + response.reference);
+          })
+          .catch((err) => {
+            console.error("Error saving order:", err);
+            alert(
+              "Order could not be saved, but payment was successful. Please contact support."
+            );
+          });
       },
-      items: sanitizedItems,
-      total: subtotal,
-      payment_reference: response.reference
-    })
-  })
-  .then(data => {
-    console.log('Order saved successfully:', data);
-    alert('Order placed! Reference: ' + response.reference);
-    // Optionally clear cart or redirect
-  })
-  .catch(err => {
-    console.error('Error saving order:', err);
-    alert('Order could not be saved, but payment was successful. Please contact support.');
-  });
-},
 
-      onClose: function() {
-        alert('Payment window closed.');
-      }
+      onClose: function () {
+        alert("Payment window closed.");
+      },
     });
   }
 
@@ -217,7 +235,9 @@ export default function Checkout() {
           <span className="checkout-total-label">Total</span>
           <span className="checkout-total-value">R{subtotal.toFixed(2)}</span>
         </div>
-        <button className="checkout-pay-btn" type="submit">Pay Now</button>
+        <button className="checkout-pay-btn" type="submit">
+          Pay Now
+        </button>
       </form>
     </div>
   );
