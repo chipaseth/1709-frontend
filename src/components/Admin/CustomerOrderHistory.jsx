@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
--import api from '../../utils/api'; // ✅ replaced axios import
-+import api from '../../utils/api';
+import api from '../../utils/api'; // ✅ replaced axios import
+import api from '../../utils/api';
 
 export default function CustomerOrderHistory({ customerId }) {
   const [orders, setOrders] = useState([]);
