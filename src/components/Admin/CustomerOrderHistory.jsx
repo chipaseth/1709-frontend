@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import api from '../../utils/api'; // ✅ replaced axios import
 import api from '../../utils/api';
 
 export default function CustomerOrderHistory({ customerId }) {
@@ -7,23 +6,30 @@ export default function CustomerOrderHistory({ customerId }) {
 
   useEffect(() => {
     let mounted = true;
-    if (!customerId) return;
+    if (!customerId) {
+      setOrders([]);
+      return;
+    }
 
-    api.get(`/orders/customer/${customerId}`)
-      .then((data) => {
+    (async () => {
+      try {
+        const res = await api.get(`/orders/customer/${customerId}`);
+        const data = res?.data ?? [];
         if (!Array.isArray(data)) {
           console.error('Customer orders response not array:', data);
           if (mounted) setOrders([]);
           return;
         }
         if (mounted) setOrders(data);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error fetching customer orders:', error);
         if (mounted) setOrders([]);
-      });
+      }
+    })();
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [customerId]);
 
   return (
