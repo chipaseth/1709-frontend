@@ -8,48 +8,45 @@ export default function ManageCustomers() {
   const [selectedCustomer, setSelectedCustomer] = useState(null);
 
   useEffect(() => {
-    async function fetchCustomers() {
-      // First check if backend is reachable
+    const fetchCustomers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      console.log('Fetching customers...');
+
+      // health check
       try {
         const healthCheck = await api.get('/health');
-        console.log('Backend health:', healthCheck.data);
-        if (
-          typeof healthCheck.data === 'string' &&
-          healthCheck.data.toLowerCase().includes('<!doctype')
-        ) {
-          throw new Error(
-            'Health returned HTML (frontend) — backend base URL misconfigured.'
-          );
-        }
+        console.log('Backend health:', healthCheck.data ?? healthCheck);
       } catch (healthError) {
         console.error('Backend health check failed:', healthError);
-        setError(
-          'Backend is not reachable. Please make sure the backend server is running and VITE_API_BASE_URL/VITE_API_URL is set.'
-        );
+        setError('Backend is not reachable. Please make sure the backend server is running on port 4000.');
         return;
       }
 
-      // Then fetch customers
-      try {
-        const response = await api.get('/customers');
-        console.log('Customers response:', response.data);
-        if (!Array.isArray(response.data)) {
-          console.error('Unexpected /customers response:', response.data);
-          setError(
-            'Unexpected response from backend when fetching customers. Check backend API and rewrites.'
-          );
-          setCustomers([]);
-          return;
-        }
-        setCustomers(response.data);
-        // auto-select first customer for convenience
-        if (response.data.length > 0) setSelectedCustomer(response.data[0]);
-      } catch (fetchError) {
-        console.error('Failed to load customers:', fetchError);
-        setError('Error fetching customers from backend.');
-      }
-    }
+      const response = await api.get('/customers');
+      console.log('Customers response raw:', response);
 
+      // Normalize response: some helpers return res.data, others return the data directly
+      const data = Array.isArray(response) ? response : response?.data ?? [];
+      console.log('Normalized customers data:', data);
+
+      if (!Array.isArray(data)) {
+        console.error('Unexpected /customers response shape:', response);
+        setError('Unexpected response from backend when fetching customers. Check backend API and rewrites.');
+        setCustomers([]);
+        return;
+      }
+
+      setCustomers(data);
+      if (!selectedCustomer && data.length) setSelectedCustomer(data[0]);
+    } catch (err) {
+      console.error('Error fetching customers:', err);
+      setError(`Failed to load customers: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
     fetchCustomers();
   }, []);
 
